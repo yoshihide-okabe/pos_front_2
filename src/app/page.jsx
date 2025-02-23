@@ -8,9 +8,11 @@ export default function Home() {
   const [product, setProduct] = useState(null);
   const [cart, setCart] = useState([]);
 
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   const fetchProduct = async () => {
     try {
-      const requestUrl = `http://localhost:8000/product/${code.trim()}`;
+      const requestUrl = `${API_BASE_URL}/product/${code.trim()}`;
       console.log("送信URL:", requestUrl);
 
       const response = await axios.get(requestUrl);
