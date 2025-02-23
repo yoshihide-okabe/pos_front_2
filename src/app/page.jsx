@@ -10,22 +10,48 @@ export default function Home() {
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+  // ⬇️ 環境変数のデバッグログ
+  console.log("API_BASE_URL:", API_BASE_URL);
+
   const fetchProduct = async () => {
+    if (!API_BASE_URL) {
+      console.error(
+        "❌ エラー: API_BASE_URL が undefined です。環境変数を確認してください。"
+      );
+      alert("サーバー設定に問題があります。管理者に連絡してください。");
+      return;
+    }
+
+    if (!code.trim()) {
+      alert("商品コードを入力してください");
+      return;
+    }
+
     try {
       const requestUrl = `${API_BASE_URL}/product/${code.trim()}`;
       console.log("送信URL:", requestUrl);
+      console.log("入力された商品コード:", code);
 
       const response = await axios.get(requestUrl);
-      console.log("APIレスポンス:", response.data); // ここでレスポンスを確認
+      console.log("✅APIレスポンス:", response.data); // ここでレスポンスを確認
 
       if (response.data && response.data.NAME) {
         setProduct(response.data);
       } else {
-        alert("商品が見つかりません");
+        alert("⚠️商品が見つかりません");
       }
     } catch (error) {
-      console.error("APIエラー:", error);
-      alert("商品が見つかりません");
+      console.error("❌APIエラー:", error);
+
+      if (error.response) {
+        console.error(
+          "❌ サーバーからのレスポンス:",
+          error.response.status,
+          error.response.data
+        );
+      }
+
+      alert("⚠️ 商品が見つかりません（サーバーエラーの可能性）");
       setProduct(null);
     }
   };
@@ -39,6 +65,11 @@ export default function Home() {
   };
 
   const purchase = async () => {
+    if (cart.length === 0) {
+      alert("カートに商品がありません");
+      return;
+    }
+
     const request = {
       emp_cd: "9999999999",
       store_cd: "30",
@@ -50,15 +81,34 @@ export default function Home() {
       })),
     };
 
+    const purchaseUrl = `${API_BASE_URL}/purchase`;
+    console.log("購入リクエスト送信URL:", purchaseUrl);
+    console.log("購入リクエストデータ:", request);
+
     try {
-      const response = await axios.post(
-        "http://localhost:8000/purchase",
-        request
-      );
-      alert(`購入完了: 合計金額 ${response.data.total_amount}円`);
+      const response = await axios.post(purchaseUrl, request);
+      alert(`✅ 購入完了: 合計金額 ${response.data.total_amount}円`);
       setCart([]);
     } catch (error) {
-      alert("購入処理に失敗しました");
+      console.error("❌ 購入APIエラー:", error);
+      if (error.response) {
+        console.error(
+          "❌ サーバーからのレスポンス:",
+          error.response.status,
+          error.response.data
+        );
+        alert(
+          `⚠️ 購入エラー: サーバーが ${error.response.status} で応答しました`
+        );
+      } else if (error.request) {
+        console.error("❌ サーバーに接続できませんでした:", error.request);
+        alert(
+          "⚠️ サーバーに接続できませんでした。ネットワークを確認してください。"
+        );
+      } else {
+        console.error("❌ リクエストエラー:", error.message);
+        alert(`⚠️ 購入リクエストエラー: ${error.message}`);
+      }
     }
   };
 
@@ -114,8 +164,11 @@ export default function Home() {
             </ul>
           </div>
           <button
-            className="bg-green-500 text-white w-full p-2"
+            className={`bg-green-500 text-white w-full p-2 ${
+              cart.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             onClick={purchase}
+            disabled={cart.length === 0}
           >
             購入
           </button>
