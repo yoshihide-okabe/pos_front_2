@@ -80,7 +80,7 @@ export default function Home() {
       pos_no: "90",
       items: cart.map((item) => ({
         code: item.CODE,
-        name: item.NAME,
+        prd_name: item.NAME,
         price: item.PRICE,
       })),
     };
