@@ -26,7 +26,7 @@ jobs:
       - name: Create .env.local file #ここを追加
         run: |
           touch .env.local
-          echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" >> .env.local
+          echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}" >> .env.local
           
       - name: npm install, build, and test
         run: |
