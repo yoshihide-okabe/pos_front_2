@@ -35,11 +35,11 @@ export default function Home() {
       const response = await axios.get(requestUrl);
       console.log("✅APIレスポンス:", response.data); // ここでレスポンスを確認
 
-      if (response.data && response.data.product_name) {
+      if (response.data && response.data.NAME) {
         setProduct({
-          NAME: response.data.product_name,
-          PRICE: response.data.product_price,
-          CODE: code.trim(),
+          NAME: response.data.NAME,
+          PRICE: response.data.PRICE,
+          CODE: response.data.CODE,
         });
       } else {
         alert("⚠️商品が見つかりません");
