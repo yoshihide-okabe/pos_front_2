@@ -28,7 +28,17 @@ jobs:
           npm install
           npm run build --if-present
           npm run test --if-present
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
 
+      # ここにコードを追加 ------------------------------------
+      - name: Copy artifact for deployment job
+        run: |
+          mkdir deploy
+          cp -r ./.next/standalone/. ./deploy
+          cp -r ./public ./deploy
+          cp -r ./.next/static/. ./deploy/.next/static
+      # ここまで追加 -----------------------------------------
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
 
@@ -60,5 +70,5 @@ jobs:
         with:
           app-name: 'tech0-gen8-step4-pos-app-115'
           slot-name: 'Production'
-          package: .
+          package: ./deploy #ここを修正(修正前→package: .)
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9CAD0134F87844B1BC2B147440ECCFD7 }}
