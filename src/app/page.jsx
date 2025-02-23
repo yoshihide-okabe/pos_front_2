@@ -1,4 +1,4 @@
-"use client"; // ← これを追加
+"use client"; // ← これを追加(ダミーpush用)
 
 import { useState } from "react";
 import axios from "axios";
